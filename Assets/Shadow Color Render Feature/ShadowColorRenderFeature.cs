@@ -1,16 +1,22 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
-public class ShadowColorRenderFeature : MonoBehaviour
+public class ShadowColorRenderFeature : ScriptableRendererFeature
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    class ShadowColorPass : ScriptableRenderPass
     {
-        
+
     }
 
-    // Update is called once per frame
-    void Update()
+    ShadowColorPass shadowColorPass;
+    RenderPassEvent renderPassEvent_Custom = RenderPassEvent.AfterRenderingOpaques;
+
+    public override void Create()
     {
-        
+        shadowColorPass = new ShadowColorPass();
+
+        shadowColorPass.renderPassEvent = renderPassEvent_Custom;
     }
+
+
 }
