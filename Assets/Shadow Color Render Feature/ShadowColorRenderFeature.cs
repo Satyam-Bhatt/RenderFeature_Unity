@@ -1,11 +1,16 @@
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
 
 public class ShadowColorRenderFeature : ScriptableRendererFeature
 {
     class ShadowColorPass : ScriptableRenderPass
     {
-
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
+        {
+            
+        }
     }
 
     ShadowColorPass shadowColorPass;
@@ -18,5 +23,8 @@ public class ShadowColorRenderFeature : ScriptableRendererFeature
         shadowColorPass.renderPassEvent = renderPassEvent_Custom;
     }
 
-
+    public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
+    {
+        renderer.EnqueuePass(shadowColorPass);
+    }
 }
