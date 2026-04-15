@@ -1,5 +1,20 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8522464062590074309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1835d3d8df7dcf04898146f9921fab3a, type: 3}
+  m_Name: ShadowColorRenderFeature
+  m_EditorClassIdentifier: Assembly-CSharp::ShadowColorRenderFeature
+  m_Active: 0
+  renderPassEvent_Custom: 100
+  shadowColorMaterial: {fileID: 2100000, guid: df7369d2c7b30394d8aec5db440975e7, type: 2}
 --- !u!114 &-7016394382133136103
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12,7 +27,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd7341551dbd7a843b0b8dd9816c35f0, type: 3}
   m_Name: DitherEffectRendererFeature
   m_EditorClassIdentifier: Assembly-CSharp::DitherEffectRendererFeature
-  m_Active: 1
+  m_Active: 0
   injectionPoint: 600
   material: {fileID: 2100000, guid: 5512109d41fc5d646bcdde9e8e93a9f1, type: 2}
 --- !u!114 &11400000
@@ -42,7 +57,8 @@ MonoBehaviour:
   m_RendererFeatures:
   - {fileID: 7833122117494664109}
   - {fileID: -7016394382133136103}
-  m_RendererFeatureMap: ad6b866f10d7b46c1975e8e07bc2a09e
+  - {fileID: -8522464062590074309}
+  m_RendererFeatureMap: ad6b866f10d7b46c1975e8e07bc2a09e3b4249ca1620ba89
   m_UseNativeRenderPass: 1
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}

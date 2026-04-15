@@ -40,7 +40,6 @@ public class ShadowColorRenderFeature : ScriptableRendererFeature
         {
             const string passName = "Shadow Color Pass";
             UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
-            UniversalLightData  = frameData.Get<UniversalLightData>();
             UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
 
             // URP exposes the shadow map handle directly via resource data
@@ -52,6 +51,10 @@ public class ShadowColorRenderFeature : ScriptableRendererFeature
                 return;
             }
 
+            // Create output Render Texture
+            RenderTextureDescriptor desc = cameraData.cameraTargetDescriptor;
+            TextureHandle coloredShadow = UniversalRenderer.CreateRenderGraphTexture(renderGraph, desc, "ColoredShadowTexture", false);
+
             using (var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var passData))
             {
                 passData.shadowMap = shadowMap;
@@ -60,10 +63,6 @@ public class ShadowColorRenderFeature : ScriptableRendererFeature
 
                 builder.UseTexture(shadowMap,AccessFlags.Read); // Declare read dependency
 
-                // Create output RT
-                RenderTextureDescriptor desc = cameraData.cameraTargetDescriptor;
-                TextureHandle coloredShadow = UniversalRenderer.CreateRenderGraphTexture(renderGraph, desc, "ColoredShadowTecture", false);
-
                 builder.SetRenderAttachment(coloredShadow,0,AccessFlags.Write);
 
                 builder.SetRenderFunc((PassData data, RasterGraphContext context) =>
@@ -71,6 +70,10 @@ public class ShadowColorRenderFeature : ScriptableRendererFeature
                     ExecutePass(data, context);
                 });
             }
+
+            // Expose output to subsequent passes via ContextContainer
+            var coloredShadowData = frameData.GetOrCreate<ColoredShadowData>();
+            coloredShadowData.coloredShadowTexture = coloredShadow;
         }
     }
 
@@ -92,7 +95,7 @@ public class ShadowColorRenderFeature : ScriptableRendererFeature
             Debug.LogWarning("ShadowColorRenderFeature material is null and will be skipped");
             return;
         }
-        shadowColorPass._material = shadowColorMaterial;
+        shadowColorPass.Setup(shadowColorMaterial);
 
         renderer.EnqueuePass(shadowColorPass);
     }
