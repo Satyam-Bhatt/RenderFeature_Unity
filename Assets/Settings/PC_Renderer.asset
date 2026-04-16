@@ -14,7 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShadowColorRenderFeature
   m_Active: 0
   renderPassEvent_Custom: 100
-  shadowColorMaterial: {fileID: 2100000, guid: df7369d2c7b30394d8aec5db440975e7, type: 2}
+  shadowColorMaterial: {fileID: 2100000, guid: 5d835609f840f304183b7edb57a63560, type: 2}
+  shadowColor:
+    r: 1
+    g: 0
+    b: 0
+    a: 1
 --- !u!114 &-7016394382133136103
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57,8 +62,7 @@ MonoBehaviour:
   m_RendererFeatures:
   - {fileID: 7833122117494664109}
   - {fileID: -7016394382133136103}
-  - {fileID: -8522464062590074309}
-  m_RendererFeatureMap: ad6b866f10d7b46c1975e8e07bc2a09e3b4249ca1620ba89
+  m_RendererFeatureMap: ad6b866f10d7b46c1975e8e07bc2a09e
   m_UseNativeRenderPass: 1
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
