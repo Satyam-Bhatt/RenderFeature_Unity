@@ -8,8 +8,9 @@ struct CustomLightingData
 
 float3 CalculateCustomLighting(CustomLightingData d)
 {
-    
+    return d.albedo;
 }
 
+// To use it in shader graph
 
 #endif
