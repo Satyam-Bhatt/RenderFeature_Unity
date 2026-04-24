@@ -61,14 +61,16 @@ Shader "Custom/TestingShader"
 
             float ToonRamp(float value, float steps, float smoothness)
             {
+                // The stepped increases in segments as value increases. The example below shows how value changes the stepped value
                 // step = 4
-                // 3.0 = 3
-                // 3.1 = 3
-                // 3.2 = 3
+                // VALUE  STEPPED
+                // 3.0  = 3
+                // 3.1  = 3
+                // 3.2  = 3
                 // 3.25 = 3.25
-                // 3.3 = 3.25
-                // 3.4 = 3.25
-                // 2.5 = 3.5
+                // 3.3  = 3.25
+                // 3.4  = 3.25
+                // 2.5  = 3.5
                 float stepped = floor(value * steps) / steps;
                 float next    = stepped + (1.0 / steps);
                 //float t       = smoothstep(next - smoothness, next, value);
