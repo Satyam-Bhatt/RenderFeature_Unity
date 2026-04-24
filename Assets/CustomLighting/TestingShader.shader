@@ -4,6 +4,10 @@ Shader "Custom/TestingShader"
     {
         [MainColor] _BaseColor("Base Color", Color) = (1, 1, 1, 1)
         [MainTexture] _BaseMap("Base Map", 2D) = "white" {}
+
+        _ShadowColor("Shadow Color", Color) = (0.2, 0.2, 0.35, 1)
+        _ToonSteps("Toon Steps", Range(1, 8)) = 3
+        _StepSmoothness("Step Smoothness", Range(0.00, 0.2)) = 0.02
     }
 
     SubShader
@@ -41,6 +45,9 @@ Shader "Custom/TestingShader"
             CBUFFER_START(UnityPerMaterial)
                 half4 _BaseColor;
                 float4 _BaseMap_ST;
+                float4 _ShadowColor;
+                float _ToonSteps;
+                float _StepSmoothness;
             CBUFFER_END
 
             Varyings vert(Attributes IN)
@@ -52,6 +59,24 @@ Shader "Custom/TestingShader"
                 return OUT;
             }
 
+            float ToonRamp(float value, float steps, float smoothness)
+            {
+                // step = 4
+                // 3.0 = 3
+                // 3.1 = 3
+                // 3.2 = 3
+                // 3.25 = 3.25
+                // 3.3 = 3.25
+                // 3.4 = 3.25
+                // 2.5 = 3.5
+                float stepped = floor(value * steps) / steps;
+                float next    = stepped + (1.0 / steps);
+                //float t       = smoothstep(next - smoothness, next, value);
+                float t = clamp((value - (next - smoothness)) / (next - (next - smoothness)), 0.0, 1.0);
+                // t = step(next,value); // If smoothness is 0 then above line becomes this. t = 1 if value > next and t = 0 if value < next
+                return lerp(stepped, next, t);
+            }
+
             float4 frag(Varyings IN) : SV_Target
             {
                 //float4 color = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, IN.uv) * _BaseColor;
@@ -61,12 +86,15 @@ Shader "Custom/TestingShader"
                 float3 N = IN.normal;
                 float3 L = mainLight.direction;
 
-                float diffuse = max(0, dot(N,L));
+                // Normal Diffuse - We don't have negative values
+                //float diffuse = max(0, dot(N,L)); 
 
-                float3 color = mainLight.color * diffuse;
+                // We *0.5 + 0.5 to elevate those negative values. 
+                float diffuse = dot(N, L) * 0.5 + 0.5;
+                float toonDiff = ToonRamp(diffuse, _ToonSteps, _StepSmoothness);
 
-                if(color.x == 0 && color.y == 0 && color.z == 0) color = (color + float3(0.1,0.1,0.1)) * float3(1,0,0);
-                
+                float3 color = mainLight.color * toonDiff;
+
                 return float4(color, 1.0);
             }
             ENDHLSL
