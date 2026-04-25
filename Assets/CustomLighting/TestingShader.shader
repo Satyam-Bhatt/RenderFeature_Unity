@@ -8,6 +8,7 @@ Shader "Custom/TestingShader"
         _ShadowColor("Shadow Color", Color) = (0.2, 0.2, 0.35, 1)
         _ToonSteps("Toon Steps", Range(1, 8)) = 3
         _StepSmoothness("Step Smoothness", Range(0.00, 0.2)) = 0.02
+        _Gloss("Gloss", float) = 4
     }
 
     SubShader
@@ -48,6 +49,7 @@ Shader "Custom/TestingShader"
                 float4 _ShadowColor;
                 float _ToonSteps;
                 float _StepSmoothness;
+                float _Gloss;
             CBUFFER_END
 
             Varyings vert(Attributes IN)
@@ -62,7 +64,7 @@ Shader "Custom/TestingShader"
             float ToonRamp(float value, float steps, float smoothness)
             {
                 // The stepped increases in segments as value increases. The example below shows how value changes the stepped value
-                // step = 4
+                // we assume step = 4
                 // VALUE  STEPPED
                 // 3.0  = 3
                 // 3.1  = 3
@@ -70,12 +72,27 @@ Shader "Custom/TestingShader"
                 // 3.25 = 3.25
                 // 3.3  = 3.25
                 // 3.4  = 3.25
-                // 2.5  = 3.5
+                // 3.5  = 3.5
+                // This just buckets a few values together so that we get some hard steps
                 float stepped = floor(value * steps) / steps;
+                // We get the next value by adding the segment to it
                 float next    = stepped + (1.0 / steps);
-                //float t       = smoothstep(next - smoothness, next, value);
-                float t = clamp((value - (next - smoothness)) / (next - (next - smoothness)), 0.0, 1.0);
-                // t = step(next,value); // If smoothness is 0 then above line becomes this. t = 1 if value > next and t = 0 if value < next
+
+                // Basically Smoothstep is 
+                // float smoothstep(float edge0, float edge1, float x) 
+                // {
+                //   t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+                //   return t * t * (3.0 - 2.0 * t);
+                // }
+                // In the above function t denotes value of x between both the edges and is clamped between 0 and 1. For lerp we generally need t to be between 0 and 1.
+                // The return value is hermite interpolation so smooth between 0 and 1
+                // If the value of Smoothness is 0 then it Basically becomes a step function
+                // t = step(next,value); <-- t = 1 if value > next and t = 0 if value < next
+                // WHY IS IT IMPORTANT?
+                // It helps to create that edge transition a bit smooth or hard. In the lerp equation we use this t value that we get from smoothstep. If smoothness is 0 then t value would be either 0 or 1 hence not interpolating between next and stepped value. But if smoothness is a bit high then t would have values between 0 and 1 and when the lerp function gets those values it interpolates between stepped and next hence giving a smooth feel
+                // SIDENOTE
+                // Don't keep smoothness to 0 otherwise you'll see jagged edges
+                float t       = smoothstep(next - smoothness, next, value);
                 return lerp(stepped, next, t);
             }
 
@@ -92,10 +109,17 @@ Shader "Custom/TestingShader"
                 //float diffuse = max(0, dot(N,L)); 
 
                 // We *0.5 + 0.5 to elevate those negative values. 
-                float diffuse = dot(N, L) * 0.5 + 0.5;
+                float diffuse = dot(N, L) * 0.5 + 0.5; // LAMBERT
                 float toonDiff = ToonRamp(diffuse, _ToonSteps, _StepSmoothness);
 
                 float3 color = mainLight.color * toonDiff;
+
+                // SPECULAR LIGHT - BLINN - PHONG
+                float3 view_Vector = normalize(GetWorldSpaceViewDir(positionWS)); //  TODO: calculate positionWS
+                float3 half_Vector = normalize(V+L);
+                float blinnPhong = max(0, dot(N,half_Vector));
+
+                float specularLight = pow(blinnPhong, _Gloss);
 
                 return float4(color, 1.0);
             }
