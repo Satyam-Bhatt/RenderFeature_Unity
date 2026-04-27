@@ -29,6 +29,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _Gloss: 16.31
     - _OutlineWidth: 0.0396
     - _RimPower: 0.9
     - _RimSmoothness: 0.2

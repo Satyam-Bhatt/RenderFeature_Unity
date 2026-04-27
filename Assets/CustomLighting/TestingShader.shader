@@ -38,6 +38,7 @@ Shader "Custom/TestingShader"
                 float4 positionHCS : SV_POSITION;
                 float2 uv : TEXCOORD0;
                 float3 normal : TEXCOORD1;
+                float3 positionWS : TEXCOORD2;
             };
 
             TEXTURE2D(_BaseMap);
@@ -58,6 +59,7 @@ Shader "Custom/TestingShader"
                 OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
                 OUT.uv = IN.uv;
                 OUT.normal = TransformObjectToWorldNormal(IN.normal);
+                OUT.positionWS = TransformObjectToWorld(IN.positionOS.xyz);
                 return OUT;
             }
 
@@ -102,7 +104,7 @@ Shader "Custom/TestingShader"
 
                 Light mainLight = GetMainLight();
 
-                float3 N = IN.normal;
+                float3 N = normalize(IN.normal);
                 float3 L = mainLight.direction;
 
                 // Normal Diffuse - We don't have negative values
@@ -115,13 +117,14 @@ Shader "Custom/TestingShader"
                 float3 color = mainLight.color * toonDiff;
 
                 // SPECULAR LIGHT - BLINN - PHONG
-                float3 view_Vector = normalize(GetWorldSpaceViewDir(positionWS)); //  TODO: calculate positionWS
-                float3 half_Vector = normalize(V+L);
+                float3 view_Vector = normalize(GetWorldSpaceViewDir(IN.positionWS));
+                float3 half_Vector = normalize(view_Vector + L);
                 float blinnPhong = max(0, dot(N,half_Vector));
 
                 float specularLight = pow(blinnPhong, _Gloss);
-
-                return float4(color, 1.0);
+                float toonSpec = smoothstep(0.5 - _StepSmoothness, 0.5, specularLight);
+                //return(toonSpec);
+                return float4(color + specularLight, 1.0);
             }
             ENDHLSL
         }
