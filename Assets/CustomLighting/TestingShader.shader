@@ -6,8 +6,13 @@ Shader "Custom/TestingShader"
         [MainTexture] _BaseMap("Base Map", 2D) = "white" {}
 
         _ShadowColor("Shadow Color", Color) = (0.2, 0.2, 0.35, 1)
-        _ToonSteps("Toon Steps", Range(1, 8)) = 3
-        _StepSmoothness("Step Smoothness", Range(0.00, 0.2)) = 0.02
+        [Header(Toon)]
+        _ToonSteps("Toon Steps", float) = 3
+        _StepSmoothness("Step Smoothness", float) = 0.02
+        [Header(Specular)]
+        _SpecularSteps("Specular Steps", float) = 2
+        _SpecularSmoothness("Specular Smoothness", float) = 0.02
+        _SpecularStrength("Specular Strength", float) = 0.5
         _Gloss("Gloss", float) = 4
     }
 
@@ -50,7 +55,10 @@ Shader "Custom/TestingShader"
                 float4 _ShadowColor;
                 float _ToonSteps;
                 float _StepSmoothness;
+                float _SpecularSteps;
+                float _SpecularSmoothness;
                 float _Gloss;
+                float _SpecularStrength;
             CBUFFER_END
 
             Varyings vert(Attributes IN)
@@ -117,14 +125,16 @@ Shader "Custom/TestingShader"
                 float3 color = mainLight.color * toonDiff;
 
                 // SPECULAR LIGHT - BLINN - PHONG
-                float3 view_Vector = normalize(GetWorldSpaceViewDir(IN.positionWS));
-                float3 half_Vector = normalize(view_Vector + L);
+                float3 view_Vector = normalize(GetWorldSpaceViewDir(IN.positionWS)); // GetWorldSpaceViewDir = _WorldSpaceCameraPos - IN.positionWS
+                float3 half_Vector = normalize(view_Vector + L); // Vector between view and light vector
                 float blinnPhong = max(0, dot(N,half_Vector));
 
                 float specularLight = pow(blinnPhong, _Gloss);
-                float toonSpec = smoothstep(0.5 - _StepSmoothness, 0.5, specularLight);
+                //float toonSpec = smoothstep(0.5 - _StepSmoothness, 0.5, specularLight);
+                float toonSpec = ToonRamp(specularLight, _SpecularSteps, _SpecularSmoothness);
+                float3 specColor = toonSpec * color; // TODO
                 //return(toonSpec);
-                return float4(color + specularLight, 1.0);
+                return float4(color + toonSpec * _SpecularStrength, 1.0);
             }
             ENDHLSL
         }
