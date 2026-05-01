@@ -40,6 +40,6 @@ Material:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineColor: {r: 0.049999982, g: 0.049999982, b: 0.09999997, a: 1}
     - _RimColor: {r: 0.8, g: 0.9, b: 1, a: 1}
-    - _ShadowColor: {r: 0.22014064, g: 0.22014064, b: 0.4811321, a: 1}
+    - _ShadowColor: {r: 0.33908868, g: 0.33908868, b: 0.5660378, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

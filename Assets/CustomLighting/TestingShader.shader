@@ -12,7 +12,8 @@ Shader "Custom/TestingShader"
         [Header(Specular)]
         _SpecularSteps("Specular Steps", float) = 2
         _SpecularSmoothness("Specular Smoothness", float) = 0.02
-        _SpecularStrength("Specular Strength", float) = 0.5
+        //_SpecularStrength("Specular Strength", float) = 0.5
+        [HDR] _SpecularColor("Specular Color", Color) = (1, 1, 1, 1)
         _Gloss("Gloss", float) = 4
     }
 
@@ -58,7 +59,8 @@ Shader "Custom/TestingShader"
                 float _SpecularSteps;
                 float _SpecularSmoothness;
                 float _Gloss;
-                float _SpecularStrength;
+                //float _SpecularStrength;
+                float4 _SpecularColor;
             CBUFFER_END
 
             Varyings vert(Attributes IN)
@@ -130,11 +132,10 @@ Shader "Custom/TestingShader"
                 float blinnPhong = max(0, dot(N,half_Vector));
 
                 float specularLight = pow(blinnPhong, _Gloss);
-                //float toonSpec = smoothstep(0.5 - _StepSmoothness, 0.5, specularLight);
                 float toonSpec = ToonRamp(specularLight, _SpecularSteps, _SpecularSmoothness);
-                float3 specColor = toonSpec * color; // TODO
+                float3 specColor = toonSpec * _SpecularColor;
                 //return(toonSpec);
-                return float4(color + toonSpec * _SpecularStrength, 1.0);
+                return float4(color + specColor, 1.0);
             }
             ENDHLSL
         }
