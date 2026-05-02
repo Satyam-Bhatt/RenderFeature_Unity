@@ -21,8 +21,19 @@ Shader "Custom/TestingShader"
     {
         Tags { "RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline" }
 
+        // OUTLINE
         Pass
         {
+            
+        }
+
+        // TOON
+        Pass
+        {
+            Name "ToonForward"
+            Tags { "LightMode" = "UniversalForward" }
+            Cull Back // TODO: What it was for remember
+
             HLSLPROGRAM
 
             #pragma vertex vert
