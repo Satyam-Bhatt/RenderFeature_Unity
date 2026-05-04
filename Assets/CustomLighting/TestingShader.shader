@@ -15,6 +15,10 @@ Shader "Custom/TestingShader"
         //_SpecularStrength("Specular Strength", float) = 0.5
         [HDR] _SpecularColor("Specular Color", Color) = (1, 1, 1, 1)
         _Gloss("Gloss", float) = 4
+
+        [Header(Outline)]
+        _OutlineColor("Outline Color", Color) = (0.05, 0.05, 0.1, 1)
+        _OutlineWidth("Outline Width", float) = 0.03
     }
 
     SubShader
@@ -24,7 +28,19 @@ Shader "Custom/TestingShader"
         // OUTLINE
         Pass
         {
-            
+            Name "Outline"
+            //Cull Front // TODO: Uncomment and check others
+            Tags { "LightMode" = "UniversalForward" }
+
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+            CBUFFER_START(UnityPerMaterial)
+            float4 _OutlineColor;
+            float _OutlineWidth;
+            CBUFFER_END
         }
 
         // TOON
@@ -32,7 +48,7 @@ Shader "Custom/TestingShader"
         {
             Name "ToonForward"
             Tags { "LightMode" = "UniversalForward" }
-            Cull Back // TODO: What it was for remember
+            Cull Back // Default - Does not render the back faces
 
             HLSLPROGRAM
 
