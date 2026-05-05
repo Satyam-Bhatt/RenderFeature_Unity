@@ -41,6 +41,24 @@ Shader "Custom/TestingShader"
             float4 _OutlineColor;
             float _OutlineWidth;
             CBUFFER_END
+
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+                float3 normalOS : NORMAL;
+            };
+
+            struct Varyings
+            {
+                float4 positionHCS : SV_POSITION;    
+            }
+
+            Varyings vert(Attributes IN)
+            {
+                Varyings OUT;
+                float3 posWS = TransformObjectToWorld(IN.positionOS.xyz);
+                float3 
+            }
         }
 
         // TOON
