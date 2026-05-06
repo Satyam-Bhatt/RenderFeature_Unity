@@ -29,8 +29,12 @@ Shader "Custom/TestingShader"
         Pass
         {
             Name "Outline"
-            //Cull Front // TODO: Uncomment and check others
-            Tags { "LightMode" = "UniversalForward" }
+            Cull Front // TODO: Uncomment and check others
+            ZTest LEqual
+            Offset 1, 1
+            //Tags { "LightMode" = "UniversalForward" } // TODO: Why need this
+
+            HLSLPROGRAM
 
             #pragma vertex vert
             #pragma fragment frag
@@ -38,8 +42,8 @@ Shader "Custom/TestingShader"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
             CBUFFER_START(UnityPerMaterial)
-            float4 _OutlineColor;
-            float _OutlineWidth;
+                float4 _OutlineColor;
+                float _OutlineWidth;
             CBUFFER_END
 
             struct Attributes
@@ -51,14 +55,28 @@ Shader "Custom/TestingShader"
             struct Varyings
             {
                 float4 positionHCS : SV_POSITION;    
-            }
+            };
 
             Varyings vert(Attributes IN)
             {
                 Varyings OUT;
-                float3 posWS = TransformObjectToWorld(IN.positionOS.xyz);
-                float3 
+                float4 posCS = TransformObjectToHClip(IN.positionOS.xyz);
+                float3 normalWS = TransformObjectToWorldNormal(IN.normalOS);
+                float4 normalCS = mul(UNITY_MATRIX_VP, float4(normalWS, 0.0));
+
+                float2 offset = normalize(normalCS.xy) * (_OutlineWidth * 0.01);
+
+                posCS.xy += offset;// * posCS.w; // Multiply if you want to scale
+
+                OUT.positionHCS = posCS;
+                return OUT;
             }
+
+            float4 frag(Varyings IN) : SV_Target
+            {
+                return _OutlineColor;    
+            }
+            ENDHLSL
         }
 
         // TOON
