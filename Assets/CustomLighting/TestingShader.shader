@@ -28,10 +28,13 @@ Shader "Custom/TestingShader"
         // OUTLINE
         Pass
         {
-            Name "Outline"
-            Cull Front // TODO: Uncomment and check others
-            ZTest LEqual
-            Offset 1, 1
+            Name "Outline" // This label shows up in the Debugger
+            Cull Front // So that front faces do not render. If they render then we won't see the next pass as it would be behind this outline. So with Cull Front we are just rendering the back faces not the front faces
+            ZTest LEqual // Default
+            // Takes two values — factor and units which together push the depth value slightly away from the camera in the depth buffer to prevent Z-Fighting. 
+            // TODO
+            // factor — scales the offset based on the slope of the polygon relative to the camera.
+            Offset 1, 1 
             //Tags { "LightMode" = "UniversalForward" } // TODO: Why need this
 
             HLSLPROGRAM
