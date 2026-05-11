@@ -32,10 +32,11 @@ Shader "Custom/TestingShader"
             Cull Front // So that front faces do not render. If they render then we won't see the next pass as it would be behind this outline. So with Cull Front we are just rendering the back faces not the front faces
             ZTest LEqual // Default
             // Takes two values — factor and units which together push the depth value slightly away from the camera in the depth buffer to prevent Z-Fighting. 
-            // TODO
-            // factor — scales the offset based on the slope of the polygon relative to the camera.
-            Offset 1, 1 
-            //Tags { "LightMode" = "UniversalForward" } // TODO: Why need this
+            // factor — if the polygon is viewed at the sharp angle the factor adds offset as defined by our value to it but if the polygon is directly facing the camera then the slope is 0 then the factor does not contribute
+            // units - a constant fixed offset that moves back in depth buffer by the value we enter here
+            Offset 1, 1
+
+            //Tags { "LightMode" = "UniversalForward" } // We don't need this as it does not receive lights or shadows. Also URP only executes one UniversalForward pass per material so it would pick the first one. As outline pass is the first one it would just use this and output a solid color as in property _OutlineColor
 
             HLSLPROGRAM
 
