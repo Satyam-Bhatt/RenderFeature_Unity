@@ -65,8 +65,13 @@ Shader "Custom/TestingShader"
             {
                 Varyings OUT;
                 float4 posCS = TransformObjectToHClip(IN.positionOS.xyz);
-                float3 normalWS = TransformObjectToWorldNormal(IN.normalOS);
-                float4 normalCS = mul(UNITY_MATRIX_VP, float4(normalWS, 0.0));
+                float3 normalWS = TransformObjectToWorldNormal(IN.normalOS); // Object -> World
+
+                // UNITY_MATRIX_VP means VP = Projection Matrix * View Matrix
+                // normalWS is in world space and multiplying it with this matrix makes it in Clip Space. Its similar to MVP we have in custom engines
+                // We want to offset the position of each vertex along the normal. As position is in Clip Space we convert the normal in Clip Space as well
+                // We make the W component of normalWS as 0 so that it is treated as a direction. (w=1 applies translation)
+                float4 normalCS = mul(UNITY_MATRIX_VP, float4(normalWS, 0.0)); // World -> Clip
 
                 float2 offset = normalize(normalCS.xy) * (_OutlineWidth * 0.01);
 
