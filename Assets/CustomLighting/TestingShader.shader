@@ -73,17 +73,21 @@ Shader "Custom/TestingShader"
                 // We make the W component of normalWS as 0 so that it is treated as a direction. (w=1 applies translation)
                 float4 normalCS = mul(UNITY_MATRIX_VP, float4(normalWS, 0.0)); // World -> Clip
 
-                // 
-                float3 offset = normalize(normalCS.xyz) * (_OutlineWidth * 0.01);
+                // We want to shift each vertex along its normal by certain amount which is determined by offset. 
+                // We just want to do it in X and Y plane as Z plane is of no use to us as outline will be expanded in XY plane only. Also as normal is in Clip Space so Z only denotes the depth
+                float2 offset = normalize(normalCS.xy) * (_OutlineWidth * 0.01);
 
-                posCS.xyz += offset;// * posCS.w; // Multiply if you want to scale
+                // Add the offset to each vertex and expand the mesh
+                posCS.xy += offset;// * posCS.w; // Multiply if you want to scale
 
+                // Assign our position to position in Homogenous Clip Space (before perspective divide)
                 OUT.positionHCS = posCS;
                 return OUT;
             }
 
             float4 frag(Varyings IN) : SV_Target
             {
+                // Color of the entire expanded mesh
                 return _OutlineColor;    
             }
             ENDHLSL
