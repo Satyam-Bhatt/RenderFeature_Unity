@@ -73,9 +73,10 @@ Shader "Custom/TestingShader"
                 // We make the W component of normalWS as 0 so that it is treated as a direction. (w=1 applies translation)
                 float4 normalCS = mul(UNITY_MATRIX_VP, float4(normalWS, 0.0)); // World -> Clip
 
-                float2 offset = normalize(normalCS.xy) * (_OutlineWidth * 0.01);
+                // 
+                float3 offset = normalize(normalCS.xyz) * (_OutlineWidth * 0.01);
 
-                posCS.xy += offset;// * posCS.w; // Multiply if you want to scale
+                posCS.xyz += offset;// * posCS.w; // Multiply if you want to scale
 
                 OUT.positionHCS = posCS;
                 return OUT;

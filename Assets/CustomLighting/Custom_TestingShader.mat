@@ -30,7 +30,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _Gloss: 8.62
-    - _OutlineWidth: 11.18
+    - _OutlineWidth: 9.86
     - _RimPower: 0.9
     - _RimSmoothness: 0.2
     - _RimThreshold: 0.632
