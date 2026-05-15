@@ -29,7 +29,7 @@ Shader "Custom/TestingShader"
         Pass
         {
             Name "Outline" // This label shows up in the Debugger
-            Cull Front // So that front faces do not render. If they render then we won't see the next pass as it would be behind this outline. So with Cull Front we are just rendering the back faces not the front faces
+            Cull Front // Inverted hull technique - only back faces render. When expanded outward via the vertex shader, the back shell pokes out behind the main mesh, creating the outline. Front faces are culled so only this rim is visible, not a solid color blob.
             ZTest LEqual // Default
             // Takes two values — factor and units which together push the depth value slightly away from the camera in the depth buffer to prevent Z-Fighting. 
             // factor — if the polygon is viewed at the sharp angle the factor adds offset as defined by our value to it but if the polygon is directly facing the camera then the slope is 0 then the factor does not contribute
@@ -74,10 +74,11 @@ Shader "Custom/TestingShader"
                 float4 normalCS = mul(UNITY_MATRIX_VP, float4(normalWS, 0.0)); // World -> Clip
 
                 // We want to shift each vertex along its normal by certain amount which is determined by offset. 
-                // We just want to do it in X and Y plane as Z plane is of no use to us as outline will be expanded in XY plane only. Also as normal is in Clip Space so Z only denotes the depth
+                // We just want to do it in X and Y plane as Z plane is of no use to us as outline will be expanded in XY plane only. Z in clip space is depth — pushing along Z would move the outline closer/further from camera, not expand it sideways on screen
                 float2 offset = normalize(normalCS.xy) * (_OutlineWidth * 0.01);
 
                 // Add the offset to each vertex and expand the mesh
+                // * posCS.w keeps outline thickness consistent regardless of distance (perspective correct). Without it, outline shrinks at distance because clip space is not yet perspective divided
                 posCS.xy += offset;// * posCS.w; // Multiply if you want to scale
 
                 // Assign our position to position in Homogenous Clip Space (before perspective divide)
